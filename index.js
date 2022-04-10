@@ -97,18 +97,20 @@ const puppeteer = require('puppeteer-core');
 const getResults = async (page, pageNumber, pagesCount) =>
   await page.evaluate(
     (data) => {
-      // TODO prices selector
-      // TODO link selector
-      // TODO image selector
+      // TODO Try to fetch whole product div and scrap from it...
+      // ? prices selector
+      const wasPrice =
+        '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-2.iekuDC';
+      const currentPrice =
+        '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-3.iepkXv';
+      // ? link selector
+      const linkToProduct =
+        '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a';
+      // ? image selector
+      const imageSelector =
+        '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a > span > img';
+      // ? product name selector
       const productSelector = `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`;
-
-      /* return Array.from(document.querySelectorAll(productSelector)).map(
-      (element) => {
-        return {
-          name: element.textContent,
-        };
-      }
-    ); */
 
       return {
         items: Array.from(document.querySelectorAll(productSelector)).map(
