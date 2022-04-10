@@ -79,9 +79,23 @@ const getResults = async (page, pageNumber, pagesCount) =>
       ).map((element) => ({
         name: element.querySelector(nameSelector).textContent,
         lastPrice: element.querySelector(lastPriceSelector)
-          ? element.querySelector(lastPriceSelector).textContent
+          ? Number(
+              element
+                .querySelector(lastPriceSelector)
+                .textContent.replace('zł', '')
+                .replace(' ', '')
+                .replace(',', '.')
+                .trim()
+            )
           : 'b/d',
-        currentPrice: element.querySelector(currentPriceSelector).textContent,
+        currentPrice: Number(
+          element
+            .querySelector(currentPriceSelector)
+            .textContent.replace('zł', '')
+            .replace(' ', '')
+            .replace(',', '.')
+            .trim()
+        ),
         link: element.querySelector(linkSelector).getAttribute('href'),
         image: element.querySelector(imageSelector).getAttribute('src'),
       }));
