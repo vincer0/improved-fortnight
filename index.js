@@ -21,6 +21,10 @@ const puppeteer = require('puppeteer-core');
 
   await page.waitForTimeout(1000);
 
+  const getLinkWithPaginationParam = (pageNumber) => {
+    return `https://www.x-kom.pl/g-5/c/345-karty-graficzne.html?page=${pageNumber}&f%5B1702%5D%5B178106%5D=1&f%5B1702%5D%5B178114%5D=1&f%5B1702%5D%5B178141%5D=1&f%5B1702%5D%5B186579%5D=1&f%5B1702%5D%5B191561%5D=1&f%5B1702%5D%5B204166%5D=1&f%5B1702%5D%5B204758%5D=1`;
+  };
+
   // pagination selector: #listing-container-wrapper > div.hqmb1u-0.bfSNKf > div.hqmb1u-3.iBNYRN > div > div.hqmb1u-7.kbjFMb
   const paginationParameters = await page.evaluate(() => {
     return Array.from(
@@ -28,19 +32,43 @@ const puppeteer = require('puppeteer-core');
         '#listing-container-wrapper > div.hqmb1u-0.bfSNKf > div.hqmb1u-3.iBNYRN > div > div.hqmb1u-7.kbjFMb'
       )
     ).map((element) => {
-      const [current, all] = element.textContent.split(' z ');
-      const [_, last] = current.split('-');
+      if (element) {
+        const [current, all] = element.textContent.split(' z ');
+        const [_, last] = current.split('-');
+
+        return {
+          success: true,
+          current,
+          all,
+          pages: Math.ceil(Number(all) / Number(last)),
+        };
+      }
+
       return {
-        current,
-        all,
-        pages: Math.ceil(Number(all) / Number(last)),
+        success: false,
       };
     });
   });
 
   console.log(paginationParameters);
 
-  // evaluate na kazdym page po goto()
+  if (paginationParameters[0].success) {
+    const products = [];
+    // TODO scrap data from first page...
+
+    // TODO jezeli stron jest wiecej to powtorz czynnosc dla reszty stron i doklej wynik....
+    if (paginationParameters[0].pages > 1) {
+      for (let index = 2; index <= paginationParameters[0].pages; index++) {
+        await page.goto(getLinkWithPaginationParam(index));
+        await page.screenshot({ path: `page-${index}.png`, fullPage: true });
+      }
+      // TODO Scrap data
+      //const result = await page.evaluate(() => {});
+
+      // TODO push results
+      //products.push(...result);
+    }
+  }
 
   // After cookies
   /* const response = await page.evaluate(() => {
@@ -59,3 +87,5 @@ const puppeteer = require('puppeteer-core');
 
   await browser.close();
 })();
+
+const getRestults = async (page) => {};
