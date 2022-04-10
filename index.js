@@ -57,8 +57,6 @@ const puppeteer = require('puppeteer-core');
       1,
       paginationParameters[0].pages
     );
-
-    console.log(firstPageResult);
   }
 
   await browser.close();
@@ -74,27 +72,23 @@ const getResults = async (page, pageNumber, pagesCount) =>
       const linkSelector = 'a.sc-1h16fat-0.irSQpN';
       const imageSelector = 'img';
 
+      const parsePriceToNumber = (price) => {
+        return Number(
+          price.replace('zł', '').replace(' ', '').replace(',', '.').trim()
+        );
+      };
+
       const productsCards = Array.from(
         document.querySelectorAll(productCardSelector)
       ).map((element) => ({
         name: element.querySelector(nameSelector).textContent,
         lastPrice: element.querySelector(lastPriceSelector)
-          ? Number(
-              element
-                .querySelector(lastPriceSelector)
-                .textContent.replace('zł', '')
-                .replace(' ', '')
-                .replace(',', '.')
-                .trim()
+          ? parsePriceToNumber(
+              element.querySelector(lastPriceSelector).textContent
             )
           : 'b/d',
-        currentPrice: Number(
-          element
-            .querySelector(currentPriceSelector)
-            .textContent.replace('zł', '')
-            .replace(' ', '')
-            .replace(',', '.')
-            .trim()
+        currentPrice: parsePriceToNumber(
+          element.querySelector(currentPriceSelector).textContent
         ),
         link: element.querySelector(linkSelector).getAttribute('href'),
         image: element.querySelector(imageSelector).getAttribute('src'),
