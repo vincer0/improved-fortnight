@@ -59,21 +59,6 @@ const puppeteer = require('puppeteer-core');
     );
 
     console.log(firstPageResult);
-
-    // TODO assign results and show...
-
-    /*     if (paginationParameters[0].pages > 1) {
-      for (let index = 2; index <= paginationParameters[0].pages; index++) {
-        await page.goto(getLinkWithPaginationParam(index));
-        const result = await getResults(
-          page,
-          index,
-          paginationParameters[0].pages
-        );
-
-        // TODO assign results and show...
-      }
-    } */
   }
 
   await browser.close();
