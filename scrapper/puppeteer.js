@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-core');
 
-(async () => {
+const fetchProducts = async () => {
   const browser = await puppeteer.launch({
     executablePath: '/opt/google/chrome/chrome',
   });
@@ -87,7 +87,7 @@ const puppeteer = require('puppeteer-core');
   }
 
   await browser.close();
-})();
+};
 
 const getResults = async (page, pageNumber, pagesCount) =>
   await page.evaluate(
@@ -128,3 +128,5 @@ const getResults = async (page, pageNumber, pagesCount) =>
     },
     { pageNumber, pagesCount }
   );
+
+export default fetchProducts;
