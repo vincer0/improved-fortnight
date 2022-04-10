@@ -52,23 +52,13 @@ const puppeteer = require('puppeteer-core');
   console.log(paginationParameters);
 
   if (paginationParameters[0].success) {
-    const products = {
-      pageData: {
-        page: null,
-        items: [],
-      },
-      total: 0,
-    };
-
     const firstPageResult = await getResults(
       page,
       1,
       paginationParameters[0].pages
     );
 
-    firstPageResult.pageData.forEach((result) => {
-      console.log(result);
-    });
+    console.log(firstPageResult);
 
     // TODO assign results and show...
 
@@ -92,56 +82,27 @@ const puppeteer = require('puppeteer-core');
 const getResults = async (page, pageNumber, pagesCount) =>
   await page.evaluate(
     (data) => {
-      // TODO Try to fetch whole product div and scrap from it...
       const productCardSelector = '#listing-container > div';
-      // ? prices selector
-      const wasPrice = {
-        label: 'Was Price',
-        selector:
-          '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-2.iekuDC',
-      };
-      const currentPrice = {
-        label: 'Current Price',
-        selector:
-          '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-3.iepkXv',
-      };
-      // ? link selector
-      const linkToProduct = {
-        label: 'Link',
-        selector:
-          '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a',
-      };
-      // ? image selector
-      const imageSelector = {
-        label: 'Image',
-        selector:
-          '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a > span > img',
-      };
-      // ? product name selector
-      const productSelector = {
-        label: 'Product name',
-        selector: `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`,
-      };
+      const nameSelector = 'a.sc-1h16fat-0.irSQpN';
+      const lastPriceSelector = 'span.sc-6n68ef-0.sc-6n68ef-2.iekuDC';
+      const currentPriceSelector = 'span.sc-6n68ef-0.sc-6n68ef-3.iepkXv';
+      const linkSelector = 'a.sc-1h16fat-0.irSQpN';
+      const imageSelector = 'img';
 
-      const selectors = [wasPrice, currentPrice, productSelector];
-
-      const selectorsResults = [];
-
-      selectors.forEach((s) => {
-        const result = Array.from(document.querySelectorAll(s.selector)).map(
-          (element) => {
-            return { label: s.label, value: 'b/d' };
-          }
-        );
-
-        selectorsResults.push({
-          page: data.pageNumber,
-          items: result,
-        });
-      });
+      const productsCards = Array.from(
+        document.querySelectorAll(productCardSelector)
+      ).map((element) => ({
+        name: element.querySelector(nameSelector).textContent,
+        lastPrice: element.querySelector(lastPriceSelector)
+          ? element.querySelector(lastPriceSelector).textContent
+          : 'b/d',
+        currentPrice: element.querySelector(currentPriceSelector).textContent,
+        link: element.querySelector(linkSelector).getAttribute('href'),
+        image: element.querySelector(imageSelector).getAttribute('src'),
+      }));
 
       return {
-        pageData: selectorsResults,
+        pageData: productsCards,
         allFetched: data.pageNumber === data.pagesCount,
       };
     },
