@@ -54,25 +54,42 @@ const puppeteer = require('puppeteer-core');
   if (paginationParameters[0].success) {
     const products = {
       items: [],
-      total: 0
+      total: 0,
     };
-    // TODO scrap data from first page...
 
-    // TODO jezeli stron jest wiecej to powtorz czynnosc dla reszty stron i doklej wynik....
+    let responseCount = 1; // TODO set 0 when fetching from fist page will be implemented
+    let allFetched = false;
+
+    const firstPageResult = await getResults(page).then((response) => {
+      responseCount++;
+      if (responseCount === paginationParameters[0].pages) {
+        allFetched = true;
+      }
+
+      return Promise.resolve(response);
+    });
+
+    products.items.push(...firstPageResult);
+
     if (paginationParameters[0].pages > 1) {
       for (let index = 2; index <= paginationParameters[0].pages; index++) {
         await page.goto(getLinkWithPaginationParam(index));
-        await page.screenshot({ path: `page-${index}.png`, fullPage: true });
-        const result = await getResults(page);
-        products.items.push(...result);
-        products.total = products.items.length;
-        console.log(products);
-      }
-      // TODO Scrap data
-      //const result = await page.evaluate(() => {});
+        const result = await getResults(page).then((response) => {
+          responseCount++;
+          if (responseCount === paginationParameters[0].pages) {
+            allFetched = true;
+          }
 
-      // TODO push results
-      //products.push(...result);
+          return Promise.resolve(response);
+        });
+
+        products.items.push(...result);
+      }
+    }
+
+    if (allFetched) {
+      products.total = products.items.length;
+      console.log(products);
     }
   }
 
@@ -94,14 +111,16 @@ const puppeteer = require('puppeteer-core');
   await browser.close();
 })();
 
-const getResults = async (page, pageNumber) =>
+const getResults = async (page) =>
   await page.evaluate(() => {
+    // TODO prices selector
+    // TODO link selector
+    // TODO image selector
     const productSelector = `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`;
 
     return Array.from(document.querySelectorAll(productSelector)).map(
       (element) => {
         return {
-          id: 
           name: element.textContent,
         };
       }
