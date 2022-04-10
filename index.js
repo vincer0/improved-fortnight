@@ -57,72 +57,69 @@ const puppeteer = require('puppeteer-core');
       total: 0,
     };
 
-    let responseCount = 1; // TODO set 0 when fetching from fist page will be implemented
-    let allFetched = false;
+    const firstPageResult = await getResults(
+      page,
+      1,
+      paginationParameters[0].pages
+    );
 
-    const firstPageResult = await getResults(page).then((response) => {
-      responseCount++;
-      if (responseCount === paginationParameters[0].pages) {
-        allFetched = true;
-      }
+    products.items.push(...firstPageResult.items);
 
-      return Promise.resolve(response);
-    });
+    if (firstPageResult.allFetched) {
+      products.total = firstPageResult.items.length;
+      console.log(products);
 
-    products.items.push(...firstPageResult);
+      return;
+    }
 
     if (paginationParameters[0].pages > 1) {
       for (let index = 2; index <= paginationParameters[0].pages; index++) {
         await page.goto(getLinkWithPaginationParam(index));
-        const result = await getResults(page).then((response) => {
-          responseCount++;
-          if (responseCount === paginationParameters[0].pages) {
-            allFetched = true;
-          }
+        const result = await getResults(
+          page,
+          index,
+          paginationParameters[0].pages
+        );
 
-          return Promise.resolve(response);
-        });
+        products.items.push(...result.items);
 
-        products.items.push(...result);
+        if (result.allFetched) {
+          products.total = products.items.length;
+          console.log(products);
+        }
       }
     }
-
-    if (allFetched) {
-      products.total = products.items.length;
-      console.log(products);
-    }
   }
-
-  // After cookies
-  /* const response = await page.evaluate(() => {
-    return Array.from(
-      document.querySelectorAll(
-        productSelector
-      )
-    ).map((element) => {
-      return {
-        name: element.textContent,
-      };
-    });
-  }); */
-
-  //console.log(response); // undefined
 
   await browser.close();
 })();
 
-const getResults = async (page) =>
-  await page.evaluate(() => {
-    // TODO prices selector
-    // TODO link selector
-    // TODO image selector
-    const productSelector = `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`;
+const getResults = async (page, pageNumber, pagesCount) =>
+  await page.evaluate(
+    (data) => {
+      // TODO prices selector
+      // TODO link selector
+      // TODO image selector
+      const productSelector = `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`;
 
-    return Array.from(document.querySelectorAll(productSelector)).map(
+      /* return Array.from(document.querySelectorAll(productSelector)).map(
       (element) => {
         return {
           name: element.textContent,
         };
       }
-    );
-  });
+    ); */
+
+      return {
+        items: Array.from(document.querySelectorAll(productSelector)).map(
+          (element) => {
+            return {
+              name: element.textContent,
+            };
+          }
+        ),
+        allFetched: data.pageNumber === data.pagesCount,
+      };
+    },
+    { pageNumber, pagesCount }
+  );
