@@ -53,7 +53,10 @@ const puppeteer = require('puppeteer-core');
 
   if (paginationParameters[0].success) {
     const products = {
-      items: [],
+      pageData: {
+        page: null,
+        items: [],
+      },
       total: 0,
     };
 
@@ -63,16 +66,13 @@ const puppeteer = require('puppeteer-core');
       paginationParameters[0].pages
     );
 
-    products.items.push(...firstPageResult.items);
+    firstPageResult.pageData.forEach((result) => {
+      console.log(result);
+    });
 
-    if (firstPageResult.allFetched) {
-      products.total = firstPageResult.items.length;
-      console.log(products);
+    // TODO assign results and show...
 
-      return;
-    }
-
-    if (paginationParameters[0].pages > 1) {
+    /*     if (paginationParameters[0].pages > 1) {
       for (let index = 2; index <= paginationParameters[0].pages; index++) {
         await page.goto(getLinkWithPaginationParam(index));
         const result = await getResults(
@@ -81,14 +81,9 @@ const puppeteer = require('puppeteer-core');
           paginationParameters[0].pages
         );
 
-        products.items.push(...result.items);
-
-        if (result.allFetched) {
-          products.total = products.items.length;
-          console.log(products);
-        }
+        // TODO assign results and show...
       }
-    }
+    } */
   }
 
   await browser.close();
@@ -98,28 +93,55 @@ const getResults = async (page, pageNumber, pagesCount) =>
   await page.evaluate(
     (data) => {
       // TODO Try to fetch whole product div and scrap from it...
+      const productCardSelector = '#listing-container > div';
       // ? prices selector
-      const wasPrice =
-        '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-2.iekuDC';
-      const currentPrice =
-        '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-3.iepkXv';
+      const wasPrice = {
+        label: 'Was Price',
+        selector:
+          '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-2.iekuDC',
+      };
+      const currentPrice = {
+        label: 'Current Price',
+        selector:
+          '#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-14.fTPISE > div > div > div > div > span.sc-6n68ef-0.sc-6n68ef-3.iepkXv',
+      };
       // ? link selector
-      const linkToProduct =
-        '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a';
+      const linkToProduct = {
+        label: 'Link',
+        selector:
+          '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a',
+      };
       // ? image selector
-      const imageSelector =
-        '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a > span > img';
+      const imageSelector = {
+        label: 'Image',
+        selector:
+          '#listing-container > div:nth-child(1) > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-11.dOfCZX > div > a > span > img',
+      };
       // ? product name selector
-      const productSelector = `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`;
+      const productSelector = {
+        label: 'Product name',
+        selector: `#listing-container > div > div > div.sc-1yu46qn-4.zZmhy.sc-2ride2-0.eYsBmG > div.sc-1yu46qn-10.iQhjQS > div > a > h3 > span`,
+      };
+
+      const selectors = [wasPrice, currentPrice, productSelector];
+
+      const selectorsResults = [];
+
+      selectors.forEach((s) => {
+        const result = Array.from(document.querySelectorAll(s.selector)).map(
+          (element) => {
+            return { label: s.label, value: 'b/d' };
+          }
+        );
+
+        selectorsResults.push({
+          page: data.pageNumber,
+          items: result,
+        });
+      });
 
       return {
-        items: Array.from(document.querySelectorAll(productSelector)).map(
-          (element) => {
-            return {
-              name: element.textContent,
-            };
-          }
-        ),
+        pageData: selectorsResults,
         allFetched: data.pageNumber === data.pagesCount,
       };
     },
