@@ -10,21 +10,24 @@ const puppeteer = require('puppeteer-core');
   const _RTX30Filter =
     'https://www.x-kom.pl/g-5/c/345-karty-graficzne.html?f%5B1702%5D%5B178106%5D=1&f%5B1702%5D%5B178114%5D=1&f%5B1702%5D%5B178141%5D=1&f%5B1702%5D%5B186579%5D=1&f%5B1702%5D%5B191561%5D=1&f%5B1702%5D%5B204166%5D=1&f%5B1702%5D%5B204758%5D=1';
   const xKom = 'https://x-kom.pl';
+  const products = {
+    items: [],
+    total: 0,
+  };
   const page = await browser.newPage();
-  await page.goto(_RTX30Filter);
 
+  await page.goto(_RTX30Filter);
   await page.waitForSelector(
     "button[class='sc-15ih3hi-0 sc-1p1bjrl-8 hdctio']"
   );
-
   await page.click(`button[class='sc-15ih3hi-0 sc-1p1bjrl-8 hdctio']`);
-
   await page.waitForTimeout(1000);
 
   const getLinkWithPaginationParam = (pageNumber) => {
     return `https://www.x-kom.pl/g-5/c/345-karty-graficzne.html?page=${pageNumber}&f%5B1702%5D%5B178106%5D=1&f%5B1702%5D%5B178114%5D=1&f%5B1702%5D%5B178141%5D=1&f%5B1702%5D%5B186579%5D=1&f%5B1702%5D%5B191561%5D=1&f%5B1702%5D%5B204166%5D=1&f%5B1702%5D%5B204758%5D=1`;
   };
 
+  // TODO make paginationParameters to be object, not array
   const paginationParameters = await page.evaluate(() => {
     const paginationSelector = `#listing-container-wrapper > div.hqmb1u-0.bfSNKf > div.hqmb1u-3.iBNYRN > div > div.hqmb1u-7.kbjFMb`;
 
@@ -57,6 +60,30 @@ const puppeteer = require('puppeteer-core');
       1,
       paginationParameters[0].pages
     );
+
+    products.items = products.items.concat(firstPageResult.items);
+
+    if (firstPageResult.allFetched) {
+      products.total = products.items.length;
+      return;
+    }
+
+    if (paginationParameters[0].pages > 2) {
+      for (let index = 2; index <= paginationParameters[0].pages; index++) {
+        await page.goto(getLinkWithPaginationParam(index));
+        const pageResult = await getResults(
+          page,
+          index,
+          paginationParameters[0].pages
+        );
+
+        products.items = products.items.concat(...pageResult.items);
+
+        if (pageResult.allFetched) {
+          products.total = products.items.length;
+        }
+      }
+    }
   }
 
   await browser.close();
@@ -95,7 +122,7 @@ const getResults = async (page, pageNumber, pagesCount) =>
       }));
 
       return {
-        pageData: productsCards,
+        items: productsCards,
         allFetched: data.pageNumber === data.pagesCount,
       };
     },
