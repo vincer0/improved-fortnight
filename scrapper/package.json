@@ -2,6 +2,7 @@
   "name": "x-kom-scrapper",
   "version": "1.0.0",
   "description": "Simple scrapper of x-kom.pl site",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "test"

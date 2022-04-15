@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core');
+import puppeteer from 'puppeteer-core';
 
 const fetchProducts = async () => {
   const browser = await puppeteer.launch({
@@ -129,5 +129,9 @@ const getResults = async (page, pageNumber, pagesCount) =>
     },
     { pageNumber, pagesCount }
   );
+
+if (process.argv && process.argv[2] === 'standalone') {
+  fetchProducts();
+}
 
 export default fetchProducts;
