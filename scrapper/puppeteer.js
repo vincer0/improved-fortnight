@@ -81,6 +81,7 @@ const fetchProducts = async () => {
 
         if (pageResult.allFetched) {
           products.total = products.items.length;
+          console.log(products);
         }
       }
     }
