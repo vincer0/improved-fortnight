@@ -52,42 +52,33 @@ const fetchProducts = async () => {
     );
   });
 
-  console.log(paginationParameters);
-
   if (paginationParameters[0].success) {
-    const firstPageResult = await getResults(
-      page,
-      1,
-      paginationParameters[0].pages
-    );
+    for (let index = 1; index <= paginationParameters[0].pages; index++) {
+      await page.goto(getLinkWithPaginationParam(index));
+      const pageResult = await getResults(
+        page,
+        index,
+        paginationParameters[0].pages
+      );
 
-    products.items = products.items.concat(firstPageResult.items);
+      products.items = products.items.concat(...pageResult.items);
 
-    if (firstPageResult.allFetched) {
-      products.total = products.items.length;
-      return;
-    }
+      if (pageResult.allFetched) {
+        products.total = products.items.length;
 
-    if (paginationParameters[0].pages > 2) {
-      for (let index = 2; index <= paginationParameters[0].pages; index++) {
-        await page.goto(getLinkWithPaginationParam(index));
-        const pageResult = await getResults(
-          page,
-          index,
-          paginationParameters[0].pages
-        );
-
-        products.items = products.items.concat(...pageResult.items);
-
-        if (pageResult.allFetched) {
-          products.total = products.items.length;
-          console.log(products);
-        }
+        await browser.close();
+        return Promise.resolve({
+          paginationParameters,
+          products,
+          message: 'Success',
+        });
       }
     }
+  } else {
+    return Promise.resolve({
+      message: 'Failure',
+    });
   }
-
-  await browser.close();
 };
 
 const getResults = async (page, pageNumber, pagesCount) =>
@@ -131,7 +122,8 @@ const getResults = async (page, pageNumber, pagesCount) =>
   );
 
 if (process.argv && process.argv[2] === 'standalone') {
-  fetchProducts();
+  const result = await fetchProducts();
+  console.log(result);
 }
 
 export default fetchProducts;
