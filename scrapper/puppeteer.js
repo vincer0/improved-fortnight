@@ -1,6 +1,6 @@
-import puppeteer from 'puppeteer-core';
+const puppeteer = require('puppeteer-core');
 
-const fetchProducts = async () => {
+module.exports = fetchProducts = async () => {
   const browser = await puppeteer.launch({
     executablePath: '/opt/google/chrome/chrome',
   });
@@ -122,8 +122,8 @@ const getResults = async (page, pageNumber, pagesCount) =>
   );
 
 if (process.argv && process.argv[2] === 'standalone') {
-  const result = await fetchProducts();
-  console.log(result);
+  (async () => {
+    const result = await fetchProducts();
+    console.log(result);
+  })();
 }
-
-export default fetchProducts;
