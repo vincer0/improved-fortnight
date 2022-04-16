@@ -1,5 +1,3 @@
-export function fetchProducts() {
-  return new Promise((resolve) => {
-    // TODO call fetchProducts from scrapper
-  });
-}
+export const fetchProducts = async () => {
+  // TODO call server endpoint
+};

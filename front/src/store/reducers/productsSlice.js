@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchProducts } from '../../api/fetchProducts';
+import { fetchProducts as scrapProducts } from '../../api/fetchProducts';
 
 const initialState = {
   products: [],
@@ -9,8 +9,10 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async () => {
-    const response = await fetchProducts();
+    const response = await scrapProducts();
     // The value we return becomes the `fulfilled` action payload
+    console.log(response);
+
     return response.data;
   }
 );
