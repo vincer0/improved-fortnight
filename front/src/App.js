@@ -1,28 +1,14 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { productsSelector, logsSelector } from './store/reducers/productsSlice';
-
-import { fetchProducts } from './store/reducers/productsSlice';
+import React from 'react';
 
 import './App.css';
 import { AppBar } from './components';
+import Content from './views/Content';
 
 const App = () => {
-  const dispatch = useDispatch();
-  const products = useSelector(productsSelector);
-  const logs = useSelector(logsSelector);
-
-  useEffect(() => {
-    if (logs.status === 'Fulfilled') {
-      return;
-    }
-
-    //dispatch(fetchProducts());
-  }, [dispatch, logs.status]);
-
   return (
     <div className="App">
       <AppBar />
+      <Content>Hello</Content>
     </div>
   );
 };
