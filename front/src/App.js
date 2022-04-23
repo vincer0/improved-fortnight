@@ -5,6 +5,7 @@ import { productsSelector, logsSelector } from './store/reducers/productsSlice';
 import { fetchProducts } from './store/reducers/productsSlice';
 
 import './App.css';
+import { AppBar } from './components';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,11 @@ const App = () => {
     //dispatch(fetchProducts());
   }, [dispatch, logs.status]);
 
-  return <div className="App">Hello</div>;
+  return (
+    <div className="App">
+      <AppBar />
+    </div>
+  );
 };
 
 export default App;

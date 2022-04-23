@@ -1,16 +1,11 @@
-body {
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body > * {
-  box-sizing: border-box;
-}
-
-body > *::before {
-  box-sizing: border-box;
-}
-
-body > *::after {
-  box-sizing: border-box;
+* {
+  font-family: Roboto;
 }
