@@ -14,7 +14,6 @@ app.use(
 
 app.get('/scrap-x', async (req, res) => {
   const scrapData = await scrapper();
-  console.log(scrapData);
   res.send(scrapData);
 });
 
