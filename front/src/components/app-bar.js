@@ -1,7 +1,9 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchProducts } from '../store/reducers/productsSlice';
+
+import { isLoadingSelector } from '../store/reducers/productsSlice';
 
 import { styled } from '@mui/system';
 import { Button } from '@mui/material';
@@ -24,8 +26,13 @@ const StyledAppBar = styled('div')(() => {
 
 const AppBar = () => {
   const dispatch = useDispatch();
+  const isLoading = useSelector(isLoadingSelector);
 
   const handleClick = () => {
+    if (isLoading) {
+      return;
+    }
+
     dispatch(fetchProducts());
   };
 
