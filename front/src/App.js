@@ -1,14 +1,16 @@
 import React from 'react';
 
 import './App.css';
-import { AppBar } from './components';
+import { AppBar, Stats } from './components';
 import Content from './views/Content';
 
 const App = () => {
   return (
     <div className="App">
       <AppBar />
-      <Content>Hello</Content>
+      <Content>
+        <Stats />
+      </Content>
     </div>
   );
 };

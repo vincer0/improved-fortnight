@@ -14,8 +14,8 @@ const initialState = {
       pages: 0,
     },
   ],
-  message: '',
-  status: '',
+  message: 'None',
+  status: 'None',
   loading: false,
 };
 
@@ -23,8 +23,6 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async () => {
     const response = await scrapProducts();
-    console.log('response: ', response);
-
     return response.data;
   }
 );
@@ -51,12 +49,13 @@ export const productsSlice = createSlice({
   },
 });
 
-export const productsSelector = (state) => state.products;
-export const paginationParameters = (state) => state.paginationParameters;
-export const isLoadingSelector = (state) => state.loading;
-export const logsSelector = (state) => ({
-  message: state.message,
-  status: state.status,
+export const productsSelector = ({ products }) => products.products;
+export const paginationParametersSelector = ({ products }) =>
+  products.paginationParameters;
+export const isLoadingSelector = ({ products }) => products.loading;
+export const logsSelector = ({ products }) => ({
+  message: products.message,
+  status: products.status,
 });
 
 export default productsSlice.reducer;

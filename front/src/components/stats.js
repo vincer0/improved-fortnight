@@ -2,7 +2,10 @@ import clsx from 'clsx';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { logsSelector } from '../store/reducers/productsSlice';
+import {
+  logsSelector,
+  paginationParametersSelector,
+} from '../store/reducers/productsSlice';
 
 import { styled } from '@mui/system';
 
@@ -24,6 +27,9 @@ const StyledStats = styled('div')(() => ({
 
 const Stats = () => {
   const logs = useSelector(logsSelector);
+  const pagination = useSelector(paginationParametersSelector);
+
+  console.log(pagination, logs);
 
   return (
     <StyledStats>
