@@ -37,7 +37,9 @@ const Stats = () => {
       </p>
       <p>
         Message:{' '}
-        <span className={clsx(logs.status === 'Success' ? 'success' : 'error')}>
+        <span
+          className={clsx(logs.message === 'Success' ? 'success' : 'error')}
+        >
           {logs.message}
         </span>
       </p>

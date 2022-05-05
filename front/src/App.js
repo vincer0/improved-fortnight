@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './App.css';
-import { AppBar, Stats } from './components';
+import { AppBar, Stats, Table } from './components';
 import Content from './views/Content';
 
 const App = () => {
@@ -10,6 +10,7 @@ const App = () => {
       <AppBar />
       <Content>
         <Stats />
+        <Table />
       </Content>
     </div>
   );

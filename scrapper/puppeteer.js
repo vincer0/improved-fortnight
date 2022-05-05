@@ -18,9 +18,11 @@ module.exports = fetchProducts = async () => {
 
   await page.goto(_RTX30Filter);
   await page.waitForSelector(
-    "button[class='sc-15ih3hi-0 sc-1p1bjrl-8 hdctio']"
+    '#react-portals > div.sc-7fwmnk-0.kBmUUF.qhmug0-0.hgAvB > div > div > div > div.sc-1p1bjrl-7.coUOqN > button.sc-15ih3hi-0.sc-1p1bjrl-10.ktRNdf'
   );
-  await page.click(`button[class='sc-15ih3hi-0 sc-1p1bjrl-8 hdctio']`);
+  await page.click(
+    `#react-portals > div.sc-7fwmnk-0.kBmUUF.qhmug0-0.hgAvB > div > div > div > div.sc-1p1bjrl-7.coUOqN > button.sc-15ih3hi-0.sc-1p1bjrl-10.ktRNdf`
+  );
   await page.waitForTimeout(1000);
 
   const getLinkWithPaginationParam = (pageNumber) => {
@@ -29,7 +31,7 @@ module.exports = fetchProducts = async () => {
 
   // TODO make paginationParameters to be object, not array
   const paginationParameters = await page.evaluate(() => {
-    const paginationSelector = `#listing-container-wrapper > div.hqmb1u-0.bfSNKf > div.hqmb1u-3.iBNYRN > div > div.hqmb1u-7.kbjFMb`;
+    const paginationSelector = `#listing-container-wrapper > div.hqmb1u-0.bfSNKf > div.hqmb1u-3.iasyZE > div > div.hqmb1u-7.kbjFMb`;
 
     return Array.from(document.querySelectorAll(paginationSelector)).map(
       (element) => {
